@@ -1,4 +1,4 @@
-# ComplexNetworks
+# Complex Networks
 
 This tutorial will walk you through a basic understanding of complex networks.
 
@@ -12,7 +12,7 @@ This data has been analyzed by many network scientists including in [this recent
 
 First load in the C. elegans connectivity data using the pre-written function `LoadCElegansData`:
 ```matlab
-[adjAll,neuronNames] = LoadCElegansData();
+[adjAll,neuronNames,positionXY] = LoadCElegansData();
 ```
 
 The variable `adjAll` contains information about all connections from every neuron (row) to every other neuron (column).
@@ -58,14 +58,25 @@ p = plot(G); % plot the graph
 
 ![Directed graph](figs/Directedgraph.png)
 
+We have two-dimensional coordinates for every neuron, `positionXY`, so we can also plot this in a representation of real space:
+
+```matlab
+figure('color','w')
+p = plot(G,'XData',positionXY(:,1),'YData',positionXY(:,2))
+axis('equal')
+p.Marker = 'o';
+p.NodeColor = 'r';
+p.MarkerSize = 6;
+```
+You can zoom in to explore the cluster of head neurons to the left of the plot, and the cluster of tail neurons towards the right of the plot, with body neurons scattered through the length of the worm.
+
 ---
 
-#### TASK: Distinguishing head/body/tail neurons
+#### TASK: Distinguishing head/body/tail neurons in the plot
 
 Can you adjust the plot above to color head, body, and tail neurons a different color?
-
-
-
+_Note:_ You can retrieve the labeling of neurons as a categorical using the function `GiveMeNeuronLabels` (head = 1, body = 2, tail = 3).
+You can set node colors using `p.NodeCData = numericLabels`, for a given set of numeric labels.
 
 ---
 
@@ -108,15 +119,16 @@ ylabel('Frequency (# neurons)')
 This is not a Gaussian distribution; there is a heavy tail with some strongly connected neurons at the upper end of connectivity.
 These high-degree neurons are known as 'hubs'.
 
-What are their names?:
+The most complex behavior in C. elegans is its locomotion, which is governed by a set of ten "command interneurons", which control both forward (neurons: AVBL, AVBR, PVCL, PVCR) and backward (neurons: AVAL, AVAR, AVDL, AVDR, AVEL, AVER) (FYI: read more [here](https://www.frontiersin.org/articles/10.3389/fncom.2013.00128/full)).
+
+I wonder if any of these show up in our list of highly connected neurons.
+Let's list the top ten to see:
 ```matlab
 [~,ix] = sort(kTot,'descend');
 for i = 1:10
     fprintf(1,'%s, k = %u\n',neuronNames{ix(i)},kTot(ix(i)))
 end
 ```
-
-
 
 ### Symmetrizing a graph
 

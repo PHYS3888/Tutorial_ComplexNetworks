@@ -130,6 +130,12 @@ for i = 1:10
 end
 ```
 
+### Shortest paths
+
+Being highly connected, many shortest paths travel through hub neurons (assuming that shortest paths are a relevant communication mechanism for this system).
+
+
+
 ### Symmetrizing a graph
 
 The C. elegans connectome contains directed information---not all connections go in both directions.
@@ -152,4 +158,27 @@ p.NodeColor = 'r';
 p.MarkerSize = 8;
 ```
 
-### Spatial embedding
+### Physical embedding
+
+The nervous system is a physical system, and as a physicist, you might be interested in characterizing the physical embedding of _C. elegans_.
+
+Figure 3A in Arnatkeviciute et al. (2018) is reproduced below, and shows a decay in connection probability as a function of distance.
+This is clearest for body-body neurons.
+
+![Degree distribution](figs/ConnectionProbability.png)
+
+---
+
+#### Challenge: Connection probability
+
+Your challenge: can you approximately reproduce the body-body distance dependence shown above?
+
+You will need:
+* Filter your analysis down to just body neurons.
+* Compute Euclidean separation distance between each pair of body neurons.
+* Estimate the connection probability separately across a range of distance bins.
+* Plot the estimated connection probability in each distance bin.
+
+Extra challenge: How about the head -> tail, and tail -> head results?
+
+---

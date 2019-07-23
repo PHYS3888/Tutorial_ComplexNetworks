@@ -1,4 +1,5 @@
 function neuronLabels = GiveMeNeuronLabels(makeCategorical)
+% Labels neurons in C. elegans as either: head (1), body (2), or tail (3)
 
 if nargin < 1
     makeCategorical = false;

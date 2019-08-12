@@ -1,10 +1,11 @@
-# Complex Networks Analysis of Neuronal Connectivity in _C. Elegans_
+# Complex Networks Analysis of Neuronal Connectivity in _C. Elegans_ :bug:
 
 This tutorial will walk you through a basic understanding of complex networks.
 
 Networks are a representation of objects (nodes) and the connections between pairs of nodes (edges).
 
-As an example dataset we will use the network of neurons, and their connectivity in the nematode worm, _C. elegans_ :bug:.
+As an example dataset we will use the network of neurons, and their connectivity in the nematode worm, _C. elegans_ :bug:, measured through painstaking reconstruction from electron microscopy.
+Note that the network of connectivity between elements of the brain is called a _connectome_.
 
 ![](figs/CElegans.png)
 
@@ -41,9 +42,7 @@ title('Neuronal connectivity in the nematode worm')
 
 This is the adjacency matrix representation of the _C. elegans_ connectome, where every neuron is a row (and a column), and edges represent the complex connectivity patterns between pairs of neurons.
 
----
-
-#### Q1: Sorted adjacency matrix
+#### Plotting a sorted adjacency matrix
 
 In their paper, Arnatkeviciute et al. plotted the same data in Figure 1A, shown here:
 
@@ -52,16 +51,20 @@ In their paper, Arnatkeviciute et al. plotted the same data in Figure 1A, shown 
 If it is the exact same data, then why does it look so different to what we plotted?
 
 Plots can be deceiving---sometimes random data can be plotted in a way that appears to the human eye to contain non-random structure.
-On closer inspection, Arnatkeviciute ordered their matrix by the position from head-to-tail.
+On closer inspection, we find that Arnatkeviciute  et al. (2018) ordered their matrix by the position from head-to-tail (called the 'anterior-posterior' axis).
 The spatial co-ordinates of each neuron is in the variable `positionXY`.
-Can you reorder the network so that neurons are ordered according to their position from head-to-tail and verify that the result matches the result from Arnatkeviciute et al. (ignoring coloring)?
 
-_**Q1**: Upload the lines of code you used to plot the sorted network that matches Arnatkeviciute et al._
+#### :question::question::question: Q1: Sorting nodes by location
+
+Can you reorder the network so that neurons are ordered according to their position from head-to-tail and verify that the result matches the result from Arnatkeviciute et al. (2018) (ignoring coloring)?
+
+Upload these lines of code to Canvas.
+_Hint:_ the `sort` function is relevant.
 
 
 ### Plotting a network in space
 
-What about visualizing the same information as a graph?
+Let's visualize the same information as a graph.
 
 ```matlab
 G = digraph(adjMatrix); % construct a graph object
@@ -76,24 +79,23 @@ But we have two-dimensional coordinates for every neuron, `positionXY`, that we 
 ```matlab
 figure('color','w')
 p = plot(G,'XData',positionXY(:,1),'YData',positionXY(:,2));
-axis('equal') % scale the x and y axes comparably
-p.Marker = 'o'; % make each neuron a circle
+p.Marker = 'o'; % plot each neuron as a circle
 p.NodeColor = 'r'; % make circles red
 p.MarkerSize = 6; % make circles size 6
+axis('equal') % make horizontal and vertical scales comparable
 ```
 
 You can zoom in to explore the cluster of head neurons to the left of the plot, and the cluster of tail neurons towards the right of the plot.
 Body neurons are scattered through the length of the worm.
 
----
 
-#### Q2: Distinguishing head, body, and tail neurons
+#### :question::question::question: Q2: Distinguishing head, body, and tail neurons
 
 Adjust the plot above to color head, body, and tail neurons a different color?
 Once you have a nice plot, upload the code you used to generate it.
 
-_Note:_ You can retrieve the labeling of neurons as a categorical using the function `GiveMeNeuronLabels` (head = 1, body = 2, tail = 3).
-You can set node colors using `p.NodeCData = numericLabels`, for a given set of numeric labels.
+_Hint:_ You can retrieve the labeling of neurons using the function `GiveMeNeuronLabels` (head = 1, body = 2, tail = 3).
+You can set node colors by setting the `p.NodeCData` property to a given set of numeric labels.
 
 ---
 
@@ -105,37 +107,32 @@ We can ask many basic questions by running simple operations on the adjacency ma
 Use the `size()` function to determine how many neurons there are.
 
 #### Is the network binary or weighted?
+
 Recall the difference between a binary and a weighted network.
 Do a simple test to determine whether the network captured in `adjMatrix` is binary or weighted.
 (_Hint:_ one way is to use the `unique()` function).
 
-:question: Is the network binary or weighted?
 
 #### Is the network directed or undirected?
+
 Recall the difference between an undirected and a directed network.
-Verify that the below tests for this:
+Verify that the code below tests for directedness:
 
 ```matlab
 symmetricMatches = (adjMatrix'==adjMatrix);
 ```
 What should you look for in the `symmetricMatches` matrix?
 
-:question: Is the matrix directed or undirected?
-
-#### Are there any self-connections?
+#### Does the connectome contain self-connections?
 
 Where do self-connections show up in the adjacency matrix?
-Use the `diag()` function to determine whether there `adjMatrix` contains self-connections.
+Use the `diag()` function to determine whether `adjMatrix` contains self-connections.
 
-:question: Does the connectome contain self-connections?
-
-#### How many edges?
+#### How many edges are in the connectome?
 
 Use the `sum()` command to count the total number of edges.
 
-:question: How many edges are there?
-
-#### In-degree and Out-degree
+#### In-degree, `kIn`, and out-degree, `kOut`
 
 How many inward-coming connections does each neuron have, its _in-degree_, `kIn`?
 What about the total number of outward-going connections, its _out-degree_, `kOut`?
@@ -144,77 +141,86 @@ Since each neuron is a row and a column, we can compute degree using sums.
 This adjacency matrix has source neurons as rows, and target neurons as columns.
 Thus we can compute the in-degree, `kIn`, as the number of sources (rows) coming into a given target (column) by summing down each column:
 ```matlab
-kIn = sum(adjMatrix,1);
+kIn = sum(adjMatrix,1); % dimension 1: sum down columns
 ```
 
-Similarly for `kOut`, as the number of targets (columns) for a given source:
+Similarly for `kOut`, as the number of targets (columns) for a given source (row):
 ```matlab
-kOut = sum(adjMatrix,2)';
+kOut = sum(adjMatrix,2)'; % dimension 2: sum across rows
 ```
 
-The total number of connections involving a neuron can be computed as the sum of these two quantities, the total degree, `kTot` (the total number of connections, in and out, from a neuron):
+The total number of connections involving a neuron (both outgoing and incoming) can be computed as the sum of these two quantities, the total degree, `kTot`:
 
 ```matlab
 kTot = kIn + kOut;
 ```
 
-Do all neurons have a similar number of connections, with some spread around a mean value (a Gaussian distribution), or are there some highly-connected hub neurons?
-To test this, we can plot the degree distribution to see how connectivity is distributed across neurons:
+Recall that in a random network, there is a tight distribution about the mean degree.
+If neurons connect at random, this would mean that most neurons will have a similar number of connections, with a tight spread around a mean value (a Binomial/Poisson distribution).
+We can test this by plotting the degree distribution to see how connectivity is distributed across neurons:
 ```matlab
 f = figure('color','w');
-h = histogram(kTot);
-h.FaceColor = 'w';
-h.EdgeColor = 'k';
+numBins = 20;
+h = histogram(kTot,numBins); % Plot the distribution of `kTot` as a histogram
+h.FaceColor = 'w'; % White bars
+h.EdgeColor = 'k'; % Black borders
 h.LineWidth = 1;
 xlabel('Total degree, kTot')
 ylabel('Frequency (# neurons)')
 ```
 
-:question: Does this distribution provide evidence for the existence of hubs? Why?
+__What about this distribution tells us that there are highly connected hubs in the _C. elegans_ connectome?__
 
-#### Which neurons are the hubs?
+#### :question::question::question: What do the hub neurons do?
 
 The most complex behavior in _C. elegans_ is its locomotion, which is governed by a set of ten _"command interneurons"_, which control both forward (neurons: AVBL, AVBR, PVCL, PVCR) and backward (neurons: AVAL, AVAR, AVDL, AVDR, AVEL, AVER).
 (If you're interested you can [read more here](https://www.frontiersin.org/articles/10.3389/fncom.2013.00128/full)).
 
-I wonder if any of these show up in our list of highly-connected neurons.
+I wonder if any of these show up in our list of highly-connected neurons...
 Let's list the top ten to see:
 ```matlab
+% Sort neurons from the most to the least connected
 [~,ix] = sort(kTot,'descend');
 for i = 1:10
     fprintf(1,'%s, k = %u\n',neuronNames{ix(i)},kTot(ix(i)))
 end
 ```
 
-:question: Is there overlap between the complex locomotion behavior of _C. elegans_ and the neurons that exhibit the strongest connectivity?__
+:question: Is there overlap between the neurons that control the worm's locomotion and the neurons that are most strongly connected in the network?
+Name the overlapping neurons.
 
 ---
 
 ## Part 3: Physical embedding
 
-Organisms are physical systems.
+The worm's nervous system is a physical system, across a head, body, and tail.
+Representing it as nodes and edges does not capture this physical embedding.
 As a physicist, you might be interested in characterizing how the connectivity in _C. elegans_ is physically embedded.
 
-Figure 3A in Arnatkeviciute et al. (2018) is reproduced below, and shows a decay in connection probability as a function of distance that is clearest for interconnections between body neurons.
+Take a look at Fig. 3A in Arnatkeviciute et al. (2018), shown below, which reveals a decrease in connection probability with the distance between pairs of neurons.
+Note that this relationship is clearest for connections between body neurons.
 
 ![Connection Probability](figs/ConnectionProbability.png)
 
-Let's try to reproduce the distance-dependence of body-body worm-brain connectivity.
+Let's try to reproduce this distance-dependence of body-body connectivity in the _C. elegans_ nervous system.
 
-### A body connectome
+#### :question::question::question: A body connectome
 
-The first step is to filter down to an adjacency matrix containing only body neurons.
+Our first step is to filter down to an adjacency matrix containing only body neurons.
 
 ```matlab
-neuronLabels = GiveMeNeuronLabels();
-isBodyNeuron = (neuronLabels==2);
+neuronLabels = GiveMeNeuronLabels(); % Label neurons in the body as '2'
+isBodyNeuron = (neuronLabels==2); % Construct a binary indicator for body neurons
 ```
 
-:question: Use the `isBodyNeuron` indicator to reduce the full adjacency matrix down to include information about body neurons only, as a new adjacency matrix, `adjMatrixBody`. Upload your code.
+Use the `isBodyNeuron` indicator to reduce the full adjacency matrix down to include information about body neurons only, as a new adjacency matrix, `adjMatrixBody`.
+Upload your code.
 
-Visualize the body neurons, as we did for the full matrix above (using `imagesc()`).
+#### Visualize body-body neuron connectivity
+Visualize interconnectivity between the worm's body neurons using `imagesc()` (as we did for the full network above).
 Visually estimate the probability that if a pair of neurons are connected, that this connection is reciprocal?
-Verify your intuition by running the following code:
+
+Assess your visual estimation ability by running the following code:
 ```matlab
 % There is a connection in either direction:
 adjMatrixBodyConnEither = (adjMatrixBody==1 | adjMatrixBody'==1);
@@ -226,13 +232,15 @@ pRecip = mean(adjMatrixBodyConnBothUpper(adjMatrixBodyConnEitherUpper==1));
 fprintf(1,'%.1f%% reciprocal connectivity rate\n',pRecip*100);
 ```
 
-### Euclidean distances
+How close was your estimate?
 
-Ok, so we have connectivity information, now we need distance information.
+#### :question::question::question: Converting coordinates to Euclidean distances
 
-:question: Convert coordinates in `positionXY` into Euclidean distances, storing the result in a new variable, `distMatrix`.
+Ok, so now we have the connectivity information for body neurons, now we need their separation distances.
+
+Convert coordinates in `positionXY` into Euclidean distances, storing the result in a new variable, `distMatrix`.
 Filter down to `distMatrixBody` using the `isBodyNeuron` indicator you created above.
-_Hint_: `pdist` is a relevant function for computing Euclidean distances.
+_Hint_: `pdist` is a relevant function for computing Euclidean distances (see also the `squareform` function to convert between vector and matrix representations).
 Upload your code.
 
 ### Binning
@@ -269,8 +277,6 @@ ylabel('Connection probability')
 
 ---
 
-#### :fire: Challenge :fire:: Connection probability
+#### :fire: Optional challenge :fire:: connection probability
 
 Challenge: Repeat for the head -> tail, and tail -> head results.
-
----

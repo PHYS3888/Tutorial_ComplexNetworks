@@ -131,6 +131,8 @@ Use the `diag()` function to determine whether `adjMatrix` contains self-connect
 #### How many edges are in the connectome?
 
 Use the `sum()` command to count the total number of edges.
+Do you need to divide this number by 2?
+Why/why not?
 
 #### In-degree, `kIn`, and out-degree, `kOut`
 
@@ -186,8 +188,8 @@ for i = 1:10
 end
 ```
 
-:question: Is there overlap between the neurons that control the worm's locomotion and the neurons that are most strongly connected in the network?
-Name the overlapping neurons.
+Is there overlap between the neurons that control the worm's locomotion and the neurons that are most strongly connected in the network?
+In the tutorial, select all of the overlapping neurons.
 
 ---
 
@@ -264,6 +266,7 @@ numBins = 10;
 [distBinCenters,connProb] = makeBins(distDataBody,connDataBody,numBins);
 ```
 
+#### :question::question::question: Connection probability as a function of distance
 Plot the connection probability, `connProb`, as a function of distance in the body of the worm _C. elegans_.
 
 ```matlab
@@ -273,7 +276,8 @@ xlabel('Separation distance (mm)')
 ylabel('Connection probability')
 ```
 
-:question: Does connection probability depend on separation distance in _C. elegans_?
+How does connection probability depend on separation distance in _C. elegans_?
+Upload your plot.
 
 ---
 

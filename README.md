@@ -12,6 +12,40 @@ Note that the network of connectivity between elements of the brain is called a 
 This data has been analyzed by many physicists (and other scientists).
 This tutorial follows results from [this recent paper](http://dx.plos.org/10.1371/journal.pcbi.1005989).
 
+## Part 0: Basics
+
+In this section you can brush up on a few basic commands for reordering and subsetting vectors/matrices in Matlab.
+
+Let's start with a 5x5 matrix:
+```matlab
+M = magic(5);
+```
+
+### 0.1 Reordering
+
+Let's reorder the rows according to the ordering defined by: `[1,4,3,5,2]`:
+
+```matlab
+ix = [1,4,3,5,2];
+M_row = M(ix,:);
+```
+Verify how the order of the rows of `M` have been switched using the `ix` permutation.
+We could do the same to the columns as `M_col = M(:,ix);`.
+And we can reorder both together as `M_both = M(ix,ix);`
+
+### 0.2 Subsetting
+What if we want to keep only a subset of rows/columns of `M`?
+One way is to define a logical indicator for the rows we want to keep:
+
+```matlab
+keepMe = [false,false,true,true,false];
+```
+
+Then we can keep just these rows, as `M(keepMe,:)`, just the columns, as `M(:,keepMe)`.
+We can do both all at once as `M(keepMe,keepMe)`.
+
+Note that the same results would be obtained if we instead defined the indices we want to keep: `keepMe = [3,4]`.
+
 ---
 
 ## Part 1: Representing and visualizing networks
@@ -53,16 +87,18 @@ If it is the exact same data, then why does it look so different to what we plot
 Plots can be deceiving---sometimes random data can be plotted in a way that appears to the human eye to contain non-random structure.
 On closer inspection, we find that Arnatkeviciute  et al. (2018) ordered their matrix by the position from head-to-tail (called the 'anterior-posterior' axis).
 The spatial co-ordinates of each neuron is in the variable `positionXY`.
+The first column of `positionXY` is the `x`-coordinates (broadly from head to tail), and the second column contains the `y`-coordinates.
 
 #### :question::question::question: Q1: Sorting nodes by location
 
 Can you reorder the network so that neurons are ordered according to their position from head-to-tail and verify that the result matches the result from Arnatkeviciute et al. (2018) (ignoring coloring)?
 
 Upload these lines of code to Canvas.
-_Hint:_ the `sort` function is relevant.
+_Hint:_ the `sort` function is relevant to get the relevant permutation (you can read about this function using `doc sort`).
 
+Note that the remainder of this tutorial will work with the original (unordered) matrix, `adjMatrix`.
 
-### Plotting a network in space
+### Plotting a network in physical space
 
 Let's visualize the same information as a graph.
 
@@ -189,7 +225,7 @@ end
 ```
 
 Is there overlap between the neurons that control the worm's locomotion and the neurons that are most strongly connected in the network?
-In the tutorial, select all of the overlapping neurons.
+In the Canvas quiz, select all of the overlapping neurons.
 
 ---
 
@@ -215,6 +251,10 @@ neuronLabels = GiveMeNeuronLabels(); % Label neurons in the body as '2'
 isBodyNeuron = (neuronLabels==2); % Construct a binary indicator for body neurons
 ```
 
+How many connections are collectively made between the body neurons of _C. elegans_?
+
+What is the total number of connections made _from_ a body neuron to a head neuron?
+
 Use the `isBodyNeuron` indicator to reduce the full adjacency matrix down to include information about body neurons only, as a new adjacency matrix, `adjMatrixBody`.
 Upload your code.
 
@@ -222,17 +262,7 @@ Upload your code.
 Visualize interconnectivity between the worm's body neurons using `imagesc()` (as we did for the full network above).
 Visually estimate the probability that if a pair of neurons are connected, that this connection is reciprocal?
 
-Assess your visual estimation ability by running the following code:
-```matlab
-% There is a connection in either direction:
-adjMatrixBodyConnEither = (adjMatrixBody==1 | adjMatrixBody'==1);
-% There is a connection in both directions:
-adjMatrixBodyConnBoth = (adjMatrixBody==1 & adjMatrixBody'==1);
-adjMatrixBodyConnEitherUpper = adjMatrixBodyConnEither(triu(true(size(adjMatrixBody))));
-adjMatrixBodyConnBothUpper = adjMatrixBodyConnBoth(triu(true(size(adjMatrixBody))));
-pRecip = mean(adjMatrixBodyConnBothUpper(adjMatrixBodyConnEitherUpper==1));
-fprintf(1,'%.1f%% reciprocal connectivity rate\n',pRecip*100);
-```
+Assess your visual estimation by running the function `whatProportionReciprocal`, using `adjMatrixBody` as input.
 
 How close was your estimate?
 
@@ -256,13 +286,20 @@ We use this property to compute the connection probability of the mean of the bi
 Run the code below, which makes 10 equally-spaced bins (`numBins = 10`) through the range of body-body distances, and, for pairs of neurons in that distance range, computes the probability that connections exist between them.
 Note that diagonal entries are self-connections and should be excluded:
 
+#### Step 1: Exclude diagonal entries
+We need to make sure that we don't include self-connections in our computations.
+
+Check out this indicator matrix: `logical(eye(size(distMatrixBody)))`
+
+Use this to turn `distMatrixBody` into a vector, `distDataBody`, that contains only non-diagonal entries.
+Do the same for `connDataBody` (as the non-diagonal data from `adjMatrixBody`).
+
+#### Step 2: Compute probability across equally spaced distance bins
+Now we want to compute the probability that a connection exists in each of 10 distance bins.
+Set `numBins` and run `makeBins` as below to do this.
+
 ```matlab
-% Important not to include the diagonal entries (self-connections)
-notDiag = ~logical(eye(size(distMatrixBody)));
-distDataBody = distMatrixBody(notDiag);
-connDataBody = adjMatrixBody(notDiag);
-numBins = 10;
-% Use the makeBins function to hide the dirty work:
+% The makeBins function hides the dirty work:
 [distBinCenters,connProb] = makeBins(distDataBody,connDataBody,numBins);
 ```
 

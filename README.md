@@ -12,7 +12,7 @@ Note that the network of connectivity between elements of the brain is called a 
 This data has been analyzed by many physicists (and other scientists).
 This tutorial follows results from [this recent paper](http://dx.plos.org/10.1371/journal.pcbi.1005989).
 
-## Part 0: Basics
+## PRE-WORK
 
 In this section you can brush up on a few basic commands for reordering and subsetting vectors/matrices in Matlab.
 

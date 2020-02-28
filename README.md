@@ -67,15 +67,10 @@ This contains information about all connections from every neuron (row) to every
 When analyzing any type of data, your habit should be to start by getting a good visualization of it.
 Starting an analysis with a comprehensive visualization can help identify any issues with the data, and can motivate the most suitable types of analysis to perform on it.
 
-Let's start with plotting the adjacency matrix as an image:
+Let's start with plotting the adjacency matrix as an image, using the `imagesc` function.
+Take a look inside the `PlotAdjacencyMatrix.m` function to see the simple set of commands to generate this plot:
 ```matlab
-figure('color','w')
-imagesc(adjMatrix)
-colormap('gray')
-axis('square')
-xlabel('Target neuron')
-ylabel('Source neuron')
-title('Neuronal connectivity in the nematode worm')
+PlotAdjacencyMatrix(adjMatrix)
 ```
 
 This is the adjacency matrix representation of the _C. elegans_ connectome, where every neuron is a row (and a column), and edges represent the complex connectivity patterns between pairs of neurons.
@@ -95,17 +90,17 @@ The first column of `positionXY` is the `x`-coordinates (broadly from head to ta
 
 #### :question::question::question: Sorting nodes by location
 
-Reorder the adjacency matrix so that neurons are ordered according to their position from head-to-tail?
+Reorder the adjacency matrix so that neurons are ordered according to their position from head-to-tail, then plot this matrix by passing it into the `PlotAdjacencyMatrix` function.
 Verify that the result matches the result from Arnatkeviciute et al. (2018) (ignoring coloring)?
 
-Upload these lines of code to Canvas.
-_Hint:_ the `sort` function can be used to get the appropriate reordering (you can read about this function using `doc sort`).
+Upload the lines of code you used to construct your reordered matrix to Canvas.
+_Hint:_ Use the `sort` function to get the permutation corresponding to the desired reordering (you can read about this function using `doc sort`).
 
 __Note__: The remainder of this tutorial will work with the original (unordered) matrix, `adjMatrix`.
 
-### Plotting a network in physical space
+### Plotting the network in physical space
 
-Let's visualize the same information as a graph.
+Let's visualize the adjacency matrix visually as a ball-and-stick representation.
 
 ```matlab
 G = digraph(adjMatrix); % construct a graph object

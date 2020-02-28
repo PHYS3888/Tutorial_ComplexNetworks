@@ -1,6 +1,7 @@
 # Complex Networks Analysis of Neuronal Connectivity in _C. Elegans_ :bug:
 
 This tutorial will walk you through a basic understanding of complex networks.
+Like all PHYS3888 tutorials, questions requiring an answer to be uploaded to Canvas are labeled as '':question::question::question:''.
 
 Networks are a representation of objects (nodes) and the connections between pairs of nodes (edges).
 
@@ -15,25 +16,26 @@ This tutorial follows results from [this recent paper](http://dx.plos.org/10.137
 ## PRE-WORK
 
 In this section you can brush up on a few basic commands for reordering and subsetting vectors/matrices in Matlab.
+If you get this done before the tutorial, you will be able to focus your efforts on the material rather than coding syntax.
 
 Let's start with a 5x5 matrix:
 ```matlab
 M = magic(5);
 ```
 
-### 0.1 Reordering
+### Reordering rows/columns of a matrix
 
 Let's reorder the rows according to the ordering defined by: `[1,4,3,5,2]`:
 
 ```matlab
 ix = [1,4,3,5,2];
-M_row = M(ix,:);
+M_row = M(ix,:)
 ```
-Verify how the order of the rows of `M` have been switched using the `ix` permutation.
-We could do the same to the columns as `M_col = M(:,ix);`.
-And we can reorder both together as `M_both = M(ix,ix);`
+Verify how the order of the rows of `M` have been permuted as specified by the `ix` permutation, and the result stored in the new, row-reordered matrix, `M_row`.
+We could do the same to the columns as `M_col = M(:,ix)`.
+And we can reorder both together as `M_both = M(ix,ix)`
 
-### 0.2 Subsetting
+### Subsetting
 What if we want to keep only a subset of rows/columns of `M`?
 One way is to define a logical indicator for the rows we want to keep:
 
@@ -41,14 +43,16 @@ One way is to define a logical indicator for the rows we want to keep:
 keepMe = [false,false,true,true,false];
 ```
 
-Then we can keep just these rows, as `M(keepMe,:)`, just the columns, as `M(:,keepMe)`.
-We can do both all at once as `M(keepMe,keepMe)`.
+Then we can keep just these rows (but all columns), as `M_row = M(keepMe,:)`.
+We can keep just these columns (but all rows), as `M_col = M(:,keepMe)`.
+We can do both at once as `M_both = M(keepMe,keepMe)`.
 
-Note that the same results would be obtained if we instead defined the indices we want to keep: `keepMe = [3,4]`.
+Note that the same results as above would be obtained if we instead defined the indices we want to keep: `keepMe = [3,4]`.
 
 ---
 
 ## Part 1: Representing and visualizing networks
+Ok, let's get into it.
 
 First load in the _C. elegans_ connectivity data using the function `LoadCElegansData`:
 ```matlab
@@ -58,7 +62,7 @@ First load in the _C. elegans_ connectivity data using the function `LoadCElegan
 The variable `adjMatrix` represents the adjacency matrix of the network.
 This contains information about all connections from every neuron (row) to every other neuron (column).
 
-### Plotting an adjacency matrix
+### Plotting an adjacency matrix as an image
 
 When analyzing any type of data, your habit should be to start by getting a good visualization of it.
 Starting an analysis with a comprehensive visualization can help identify any issues with the data, and can motivate the most suitable types of analysis to perform on it.
@@ -89,14 +93,15 @@ On closer inspection, we find that Arnatkeviciute  et al. (2018) ordered their m
 The spatial co-ordinates of each neuron is in the variable `positionXY`.
 The first column of `positionXY` is the `x`-coordinates (broadly from head to tail), and the second column contains the `y`-coordinates.
 
-#### :question::question::question: Q1: Sorting nodes by location
+#### :question::question::question: Sorting nodes by location
 
-Can you reorder the network so that neurons are ordered according to their position from head-to-tail and verify that the result matches the result from Arnatkeviciute et al. (2018) (ignoring coloring)?
+Reorder the adjacency matrix so that neurons are ordered according to their position from head-to-tail?
+Verify that the result matches the result from Arnatkeviciute et al. (2018) (ignoring coloring)?
 
 Upload these lines of code to Canvas.
-_Hint:_ the `sort` function is relevant to get the relevant permutation (you can read about this function using `doc sort`).
+_Hint:_ the `sort` function can be used to get the appropriate reordering (you can read about this function using `doc sort`).
 
-Note that the remainder of this tutorial will work with the original (unordered) matrix, `adjMatrix`.
+__Note__: The remainder of this tutorial will work with the original (unordered) matrix, `adjMatrix`.
 
 ### Plotting a network in physical space
 
@@ -107,7 +112,7 @@ G = digraph(adjMatrix); % construct a graph object
 p = plot(G); % plot the graph
 ```
 
-Do you know what you're looking at?! Zoom in and have a play.
+Do you know what you're looking at?! Zoom in and have a play :mag::smiley:
 
 Note that this visualization is in an abstract space, that is, the coordinates don't correspond to physical space.
 But we have two-dimensional coordinates for every neuron, `positionXY`, that we can use to plot the network information in physical space:
@@ -121,17 +126,14 @@ p.MarkerSize = 6; % make circles size 6
 axis('equal') % make horizontal and vertical scales comparable
 ```
 
-You can zoom in to explore the cluster of head neurons to the left of the plot, and the cluster of tail neurons towards the right of the plot.
-Body neurons are scattered through the length of the worm.
+You can zoom in on this physical connectome plot to explore the cluster of head neurons (towards the left), and the cluster of tail neurons (towards the right).
+Body neurons are scattered through the length of the nematode worm.
 
 
-#### :question::question::question: Q2: Distinguishing head, body, and tail neurons
+<!-- #### :question::question::question: Q2: Distinguishing head, body, and tail neurons -->
 
-Adjust the plot above to color head, body, and tail neurons a different color?
-Once you have a nice plot, upload the code you used to generate it.
-
-_Hint:_ You can retrieve the labeling of neurons using the function `GiveMeNeuronLabels` (head = 1, body = 2, tail = 3).
-You can set node colors by setting the `p.NodeCData` property to a given set of numeric labels.
+You can retrieve the labeling of neurons using the `GiveMeNeuronLabels` function, which labels head neurons as `1`, body neurons as `2`, and tail neurons as `3`).
+Use this information to adjust the physical connectome plot above to color head, body, and tail neurons a different color by setting the `p.NodeCData` property.
 
 ---
 
@@ -140,7 +142,7 @@ You can set node colors by setting the `p.NodeCData` property to a given set of 
 We can ask many basic questions by running simple operations on the adjacency matrix.
 
 #### How many neurons?
-Use the `size()` function to determine how many neurons there are.
+:question::question::question: From the size of the adjacency matrix, determine how many neurons there are.
 
 #### Is the network binary or weighted?
 
@@ -169,6 +171,8 @@ Use the `diag()` function to determine whether `adjMatrix` contains self-connect
 Use the `sum()` command to count the total number of edges.
 Do you need to divide this number by 2?
 Why/why not?
+
+:question::question::question: How many edges are in the _C. elegans_ connectome?
 
 #### In-degree, `kIn`, and out-degree, `kOut`
 

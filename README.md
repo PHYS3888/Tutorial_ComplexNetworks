@@ -1,8 +1,15 @@
 # Complex Networks Analysis of Neuronal Connectivity in _C. Elegans_ :bug::bug::bug:
 
 This tutorial will walk you through a basic understanding of complex networks.
-Like all PHYS3888 tutorials, questions requiring an answer to be uploaded to Canvas are labeled as '':question::question::question:''.
 
+### Getting Started: General PHYS3888 tutorial info
+Like all PHYS3888 tutorials, questions requiring an answer to be input to the Canvas quiz are labeled as '':question::question::question:''.
+Optional questions are labeled '':yum:'' (just for fun) and optional advanced questions are labeled as '':fire:''.
+
+Before you get started, download all the material for this tutorial to your computer by pressing the green "Clone or download" button above, and click "Download as zip".
+Open Matlab and navigate to the directory you saved the files to, and then work through the tutorial in Matlab, following the instructions in this browser window (which renders the instructions contained in `README.md`).
+
+### Intro
 Networks are a representation of objects (nodes) and the connections between pairs of nodes (edges).
 
 As an example dataset we will use the network of neurons, and their connectivity in the nematode worm, _C. elegans_ :bug:, measured through painstaking reconstruction from electron microscopy.

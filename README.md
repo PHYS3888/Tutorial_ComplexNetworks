@@ -1,4 +1,4 @@
-# Complex Networks Analysis of Neuronal Connectivity in _C. Elegans_ :bug:
+# Complex Networks Analysis of Neuronal Connectivity in _C. Elegans_ :bug::bug::bug:
 
 This tutorial will walk you through a basic understanding of complex networks.
 Like all PHYS3888 tutorials, questions requiring an answer to be uploaded to Canvas are labeled as '':question::question::question:''.
@@ -11,12 +11,15 @@ Note that the network of connectivity between elements of the brain is called a 
 ![](figs/CElegans.png)
 
 This data has been analyzed by many physicists (and other scientists).
-This tutorial follows results from [this recent paper](http://dx.plos.org/10.1371/journal.pcbi.1005989).
+This tutorial follows results from [this recent paper](http://dx.plos.org/10.1371/journal.pcbi.1005989), and is presented in three parts:
+1. Representing and visualizing networks
+2. Computing network properties
+3. Physical embedding
 
-## PRE-WORK
+## PRE-WORK: Basic matrix manipulations
 
-In this section you can brush up on a few basic commands for reordering and subsetting vectors/matrices in Matlab.
-If you get this done before the tutorial, you will be able to focus your efforts on the material rather than coding syntax.
+In this section you will brush up on a few basic commands for reordering, subsetting, and summing vectors/matrices in Matlab.
+Aim to get this done before the tutorial so that you can focus your in-class time on the core material rather than coding syntax.
 
 Let's start with a 5x5 matrix:
 ```matlab
@@ -35,6 +38,17 @@ Verify how the order of the rows of `M` have been permuted as specified by the `
 We could do the same to the columns as `M_col = M(:,ix)`.
 And we can reorder both together as `M_both = M(ix,ix)`
 
+### Producing a permutation by sorting
+What if we want to sort the rows `M` according to its first column?
+Let's look at the first column: `M(:,1)`.
+We can get this permutation using the `sort` function, as:
+```matlab
+[~,ix] = sort(M(:,1),'ascend')
+```
+Our permutation is the second output of this function, as `ix`, and we have ignored the first output by using a `~` in its place.
+
+Now we can use this permutation, `ix`, to sort the rows of M as: `M_sort = M(ix,:)`.
+
 ### Subsetting
 What if we want to keep only a subset of rows/columns of `M`?
 One way is to define a logical indicator for the rows we want to keep:
@@ -48,6 +62,28 @@ We can keep just these columns (but all rows), as `M_col = M(:,keepMe)`.
 We can do both at once as `M_both = M(keepMe,keepMe)`.
 
 Note that the same results as above would be obtained if we instead defined the indices we want to keep: `keepMe = [3,4]`.
+
+### Summing elements of a matrix
+
+#### Rows/columns
+Let's keep the first four columns of M.
+I'm sure you knew that you can do this as `M_cut = M(:,1:4)`
+
+Recall that you can compute the sum of each column as `sum(M_cut,1)` (the `1` specifies summing down the first dimension: each sum is a sum over rows).
+Verify that this yields a row vector of length 4: one per column of `M_cut`.
+Because the columns of `M_cut` are from a magic square, these columns should all sum to 65.
+
+What about for the rows? We can do `sum(M_cut,2)`, specifying `2` to specify a sum across columns.
+We get a number for each row, and this therefore should be a 5-long column vector.
+
+Other Matlab functions can be applied across rows or columns of a matrix in a similar way, including `mean`.
+
+#### All elements
+
+What if we want to sum everything in a matrix?
+We can do this by a double sum, e.g., `sum(sum(M))`, which first sums the rows and then sums these sums.
+
+We could achieve the same thing by stretching `M` out into one long vector, as `M(:)`, and then summing this: `sum(M(:))`.
 
 ---
 
@@ -183,127 +219,125 @@ kIn = sum(adjMatrix,1); % dimension 1: sum down columns
 
 Similarly for `kOut`, as the number of targets (columns) for a given source (row):
 ```matlab
-kOut = sum(adjMatrix,2)'; % dimension 2: sum across rows
+kOut = sum(adjMatrix,2); % dimension 2: sum across rows
 ```
 
 The total number of connections involving a neuron (both outgoing and incoming) can be computed as the sum of these two quantities, the total degree, `kTot`:
 
 ```matlab
-kTot = kIn + kOut;
+kTot = kIn + kOut';
 ```
+(we need to transpose `kOut` using `'` to match the dimensions for the sum)
 
 Recall that in a random network, there is a tight distribution about the mean degree.
 If neurons connect at random, this would mean that most neurons will have a similar number of connections, with a tight spread around a mean value (a Binomial/Poisson distribution).
+
 We can test this by plotting the degree distribution to see how connectivity is distributed across neurons:
 ```matlab
-f = figure('color','w');
-numBins = 20;
-h = histogram(kTot,numBins); % Plot the distribution of `kTot` as a histogram
-h.FaceColor = 'w'; % White bars
-h.EdgeColor = 'k'; % Black borders
-h.LineWidth = 1;
+PlotDistribution(kTot,20); % use 20 bins in the histogram
 xlabel('Total degree, kTot')
-ylabel('Frequency (# neurons)')
 ```
 
-__What about this distribution tells us that there are highly connected hubs in the _C. elegans_ connectome?__
+:question::question::question: What about this distribution tells us that there are highly connected hub neurons in the _C. elegans_ connectome?
 
-#### :question::question::question: What do the hub neurons do?
+#### What do the hub neurons do?
 
-The most complex behavior in _C. elegans_ is its locomotion, which is governed by a set of ten _"command interneurons"_, which control both forward (neurons: AVBL, AVBR, PVCL, PVCR) and backward (neurons: AVAL, AVAR, AVDL, AVDR, AVEL, AVER).
-(If you're interested you can [read more here](https://www.frontiersin.org/articles/10.3389/fncom.2013.00128/full)).
+The most complex behavior in _C. elegans_ is its locomotion, which is governed by a set of ten _"command interneurons"_, which control both forward (neurons: AVBL, AVBR, PVCL, PVCR) and backward (neurons: AVAL, AVAR, AVDL, AVDR, AVEL, AVER). [If you're interested you can [read more here](https://www.frontiersin.org/articles/10.3389/fncom.2013.00128/full)].
 
-I wonder if any of these show up in our list of highly-connected neurons...
-Let's list the top ten to see:
+I wonder if any of these show up in our list of highly-connected hub neurons...? :smirk:
+
+We can first sort neurons from the most to the least connected by applying the `sort` function to `kTot` and specifying `descend`:
+
 ```matlab
-% Sort neurons from the most to the least connected
 [~,ix] = sort(kTot,'descend');
-for i = 1:10
-    fprintf(1,'%s, k = %u\n',neuronNames{ix(i)},kTot(ix(i)))
-end
+```
+This second output, `ix`, gives us the permutation that sorts neurons from the most connected (`ix(1)`) to the least connected (`ix(end)`).
+
+So now we can use this `ix` to list the top ten:
+```matlab
+ListTen(neuronNames,kTot,ix)
 ```
 
 Is there overlap between the neurons that control the worm's locomotion and the neurons that are most strongly connected in the network?
-In the Canvas quiz, select all of the overlapping neurons.
+
+:question::question::question: Select all of the hub neurons that are also part of the locomotion system of _C. elegans_.
 
 ---
 
 ## Part 3: Physical embedding
 
-The worm's nervous system is a physical system, across a head, body, and tail.
-Representing it as nodes and edges does not capture this physical embedding.
-As a physicist, you might be interested in characterizing how the connectivity in _C. elegans_ is physically embedded.
+The worm's nervous system is a physical system that spans a head, body, and tail.
+Representing it abstractly as a set of nodes and edges ignores this spatial information.
+As physicists, we are interested in characterizing the physical rules that might shape neuronal connectivity in _C. elegans_.
 
 Take a look at Fig. 3A in Arnatkeviciute et al. (2018), shown below, which reveals a decrease in connection probability with the distance between pairs of neurons.
-Note that this relationship is clearest for connections between body neurons.
+This means that pairs of neurons that are physically close to each other are more likely to be connected than those that are far apart.
+You can see that this relationship is clearest for connections between body neurons (body -> body, shown purple).
 
 ![Connection Probability](figs/ConnectionProbability.png)
 
-Let's try to reproduce this distance-dependence of body-body connectivity in the _C. elegans_ nervous system.
+Let's try to reproduce this finding in the body neurons of the _C. elegans_ nervous system. :satisfied:
 
-#### :question::question::question: A body connectome
+#### A worm body connectome
 
-Our first step is to filter down to an adjacency matrix containing only body neurons.
+Because we're only interested in body neurons, our first step is to filter down the adjacency matrix to only contain body neurons.
+Check out the sketch below of the different parts of the adjacency matrix to understand what we're trying to do.
+The part of the adjacency matrix that we're trying to isolate (shaded yellow) is where both the source and target are body neurons.
+![](figs/BodyBody.png)
 
+As shown in the sketch, we need can start by constructing a _binary indicator_ for body neurons: this variable should be `true` for body neurons and `false` for head or tail neurons.
+Because `GiveMeNeuronLabels()` labels body neurons as `2`, we can do this by finding where this indicator equals 2.
+Make sure you understand how this is achieved using the following code:
 ```matlab
-neuronLabels = GiveMeNeuronLabels(); % Label neurons in the body as '2'
+neuronLabels = GiveMeNeuronLabels(); % Labels neurons in the body as '2'
 isBodyNeuron = (neuronLabels==2); % Construct a binary indicator for body neurons
 ```
 
-How many connections are collectively made between the body neurons of _C. elegans_?
-
-What is the total number of connections made _from_ a body neuron to a head neuron?
-
 Use the `isBodyNeuron` indicator to reduce the full adjacency matrix down to include information about body neurons only, as a new adjacency matrix, `adjMatrixBody`.
-Upload your code.
 
-#### Visualize body-body neuron connectivity
+:question::question::question: How many connections exist between the body neurons of _C. elegans_?
+
+:question::question::question: In the sketch above, identify the part of the adjacency matrix that corresponds to connections _from_ body neurons _to_ head neurons.
+By constructing an indicator for head neurons, as `isHeadNeuron = (neuronLabels==1);`, compute the total number of connections made _from_ a body neuron to a head neuron.
+
+#### :yum: [Optional]: Visualize body-body neuron connectivity:yum:
 Visualize interconnectivity between the worm's body neurons using `imagesc()` (as we did for the full network above).
 Visually estimate the probability that if a pair of neurons are connected, that this connection is reciprocal?
 
-Assess your visual estimation by running the function `whatProportionReciprocal`, using `adjMatrixBody` as input.
+To assess your visual estimate, you can compute the true value by running the function `whatProportionReciprocal(adjMatrixBody)`.
 
-How close was your estimate?
+Was your estimate close?
 
-#### :question::question::question: Converting coordinates to Euclidean distances
+#### Converting coordinates to Euclidean distances
 
-Ok, so now we have the connectivity information for body neurons, now we need their separation distances.
+Ok, so now that we have the connectivity information for body neurons, in `adjMatrixBody`, now we need their physical separation distances.
 
-Convert coordinates in `positionXY` into Euclidean distances, storing the result in a new variable, `distMatrix`.
-Filter down to `distMatrixBody` using the `isBodyNeuron` indicator you created above.
-_Hint_: `pdist` is a relevant function for computing Euclidean distances (see also the `squareform` function to convert between vector and matrix representations).
-Upload your code.
+1. Reduce the coordinates for all neurons, `positionXY`, to those just for body neurons using the `isBodyNeuron` indicator. Store the result in the variable `positionXY_body`.
+2. Convert these body-neuron coordinates into Euclidean distances using the `pdist` function. Use the `squareform` function to convert these distances into a matrix and store them in a new variable, `distMatrixBody`.
 
-### Binning
-Ok, so now we have a distance for every connection between pairs of body neurons, and whether that connection exists or not.
+### Estimating connection probabilities
+Ok, so now we have a physical distance for all pairs of body neurons, `distMatrixBody`, and whether a connection exists or not, `adjMatrixBody`.
+We can now proceed to compute the probability that two neurons will be connected as a function of their separation distance.
 
-We want to include pairwise connections in both directions (i.e., both the upper triangle and the lower triangle of our connection matrix, `adjMatrixBody`).
-
-Calculating probabilities are easier for binary data, because we can compute the probability of being a `1` as the mean of a binary vector.
-For example, note that `mean([1,1,0,0]) = 0.5`, or `mean([1,1,1,1,0]) = 0.8`.
+Calculating probabilities are easy with binary data, because we can compute the probability of being a `1` directly as the mean of a binary vector.
+Do you see how this works?
+Consider `mean([1,1,0,0]) = 0.5`, or `mean([1,1,1,1,0]) = 0.8`.
 We use this property to compute the connection probability of the mean of the binary connection indicators.
+
+### Distance bins
+
 Run the code below, which makes 10 equally-spaced bins (`numBins = 10`) through the range of body-body distances, and, for pairs of neurons in that distance range, computes the probability that connections exist between them.
-Note that diagonal entries are self-connections and should be excluded:
 
-#### Step 1: Exclude diagonal entries
-We need to make sure that we don't include self-connections in our computations.
-
-Check out this indicator matrix: `logical(eye(size(distMatrixBody)))`
-
-Use this to turn `distMatrixBody` into a vector, `distDataBody`, that contains only non-diagonal entries.
-Do the same for `connDataBody` (as the non-diagonal data from `adjMatrixBody`).
-
-#### Step 2: Compute probability across equally spaced distance bins
-Now we want to compute the probability that a connection exists in each of 10 distance bins.
+#### Connection probability as a function of distance
+Now we want to compute the probability that a connection exists in each of 10 equally-spaced distance bins.
 Set `numBins` and run `makeBins` as below to do this.
 
 ```matlab
 % The makeBins function hides the dirty work:
-[distBinCenters,connProb] = makeBins(distDataBody,connDataBody,numBins);
+[distBinCenters,connProb] = makeBins(distMatrixBody,adjMatrixBody,numBins);
 ```
 
-#### :question::question::question: Connection probability as a function of distance
-Plot the connection probability, `connProb`, as a function of distance in the body of the worm _C. elegans_.
+Now we can plot the connection probability, `connProb`, as a function of distance in the worm's body:
 
 ```matlab
 f = figure('color','w');
@@ -312,7 +346,9 @@ xlabel('Separation distance (mm)')
 ylabel('Connection probability')
 ```
 
+:question::question::question:
 How does connection probability depend on separation distance in _C. elegans_?
+Does this mean that a pair of nearby neurons are more or less likely to be connected than a pair of distant neurons?
 Upload your plot.
 
 ---

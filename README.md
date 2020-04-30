@@ -111,16 +111,17 @@ When analyzing any type of data, your habit should be to start by getting a good
 Starting an analysis with a comprehensive visualization can help identify any issues with the data, and can motivate the most suitable types of analysis to perform on it.
 
 Let's start with plotting the adjacency matrix as an image, using the `imagesc` function.
-Take a look inside the `PlotAdjacencyMatrix.m` function to see the simple set of commands to generate this plot:
+Take a look inside the `PlotAdjacencyMatrix` function to see the simple set of commands to generate this plot:
 ```matlab
 PlotAdjacencyMatrix(adjMatrix)
 ```
 
-This is the adjacency matrix representation of the _C. elegans_ connectome, where every neuron is a row (and a column), and edges represent the complex connectivity patterns between pairs of neurons.
+This is the adjacency matrix representation of the _C. elegans_ connectome, where every neuron is a row (and a column), and edges are shown white.
+The plot reveals complex connectivity patterns between pairs of neurons in _C. elegans_.
 
 #### Plotting a sorted adjacency matrix
 
-In their paper, Arnatkeviciute et al. plotted the same data in Figure 1A, shown here:
+In their 2018 paper, Arnatkeviciute plotted the same data in Figure 1A, shown here:
 
 ![Arnatkeviciute et al.](figs/Arnatkeviciute.png)
 
@@ -131,7 +132,7 @@ On closer inspection, we find that Arnatkeviciute  et al. (2018) ordered their m
 The spatial co-ordinates of each neuron is in the variable `positionXY`.
 The first column of `positionXY` is the `x`-coordinates (broadly from head to tail), and the second column contains the `y`-coordinates.
 
-#### :question::question::question: Sorting nodes by location
+#### :question::question::question: Q1: Sorting nodes by location
 
 Reorder the adjacency matrix so that neurons are ordered according to their position from head-to-tail, then plot this matrix by passing it into the `PlotAdjacencyMatrix` function.
 Verify that the result matches the result from Arnatkeviciute et al. (2018) (ignoring coloring)?
@@ -317,9 +318,10 @@ Was your estimate close?
 
 #### Converting coordinates to Euclidean distances
 
-Ok, so now that we have the connectivity information for body neurons, in `adjMatrixBody`, now we need their physical separation distances.
+Ok, now that we have the connectivity information for body neurons in `adjMatrixBody`, we need their physical separation distances.
 
-1. Reduce the coordinates for all neurons, `positionXY`, to those just for body neurons using the `isBodyNeuron` indicator. Store the result in the variable `positionXY_body`.
+1. Reduce the coordinates for all neurons, `positionXY`, to those just for body neurons using the `isBodyNeuron` indicator.
+Store the result in the variable `positionXY_body`.
 2. Convert these body-neuron coordinates into Euclidean distances using the `pdist` function. Use the `squareform` function to convert these distances into a matrix and store them in a new variable, `distMatrixBody`.
 
 ### Estimating connection probabilities
@@ -328,8 +330,8 @@ We can now proceed to compute the probability that two neurons will be connected
 
 Calculating probabilities are easy with binary data, because we can compute the probability of being a `1` directly as the mean of a binary vector.
 Do you see how this works?
-Consider `mean([1,1,0,0]) = 0.5`, or `mean([1,1,1,1,0]) = 0.8`.
-We use this property to compute the connection probability of the mean of the binary connection indicators.
+Consider a vector with 50% 1s: `mean([1,1,0,0]) = 0.5`, or a vector with 80% 1s: `mean([1,1,1,1,0]) = 0.8`.
+We use this property of averaging binary indicators to compute the connection probability.
 
 ### Distance bins
 
@@ -340,7 +342,7 @@ Now we want to compute the probability that a connection exists in each of 10 eq
 Set `numBins` and run `makeBins` as below to do this.
 
 ```matlab
-% The makeBins function hides the dirty work:
+% The makeBins function hides the dirty work (including removing self-connections from the computation):
 [distBinCenters,connProb] = makeBins(distMatrixBody,adjMatrixBody,numBins);
 ```
 

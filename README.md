@@ -91,6 +91,7 @@ What if we want to sum everything in a matrix?
 We can do this by a double sum, e.g., `sum(sum(M))`, which first sums the rows and then sums these sums.
 
 We could achieve the same thing by stretching `M` out into one long vector, as `M(:)`, and then summing this: `sum(M(:))`.
+There is also the `'all'` setting in `sum` that gives another way of the doing the same computation: `sum(M,'all')`.
 
 ---
 

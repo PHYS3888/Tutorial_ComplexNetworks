@@ -228,11 +228,13 @@ What about the total number of outward-going connections, its _out-degree_, `kOu
 Since each neuron is a row and a column, we can compute degree using sums.
 This adjacency matrix has source neurons as rows, and target neurons as columns.
 Thus we can compute the in-degree, `kIn`, as the number of sources (rows) coming into a given target (column) by summing down each column:
+
 ```matlab
 kIn = sum(adjMatrix,1); % dimension 1: sum down columns
 ```
 
 Similarly for `kOut`, as the number of targets (columns) for a given source (row):
+
 ```matlab
 kOut = sum(adjMatrix,2); % dimension 2: sum across rows
 ```
@@ -242,7 +244,7 @@ The total number of connections involving a neuron (both outgoing and incoming) 
 ```matlab
 kTot = kIn + kOut';
 ```
-(we need to transpose `kOut` using `'` to match the dimensions for the sum)
+(we need to transpose `kOut` using `'` to match the dimensions for the sum).
 
 Recall that in a random network, there is a tight distribution about the mean degree.
 If neurons connect at random, this would mean that most neurons will have a similar number of connections, with a tight spread around a mean value (a Binomial/Poisson distribution).
@@ -253,7 +255,8 @@ PlotDistribution(kTot,20); % use 20 bins in the histogram
 xlabel('Total degree, kTot')
 ```
 
-:question::question::question: What about this distribution tells us that there are highly connected hub neurons in the _C. elegans_ connectome?
+:question::question::question:
+What about this distribution tells us that there are highly connected hub neurons in the _C. elegans_ connectome?
 
 #### What do the hub neurons do?
 
@@ -275,7 +278,8 @@ ListTen(neuronNames,kTot,ix)
 
 Is there overlap between the neurons that control the worm's locomotion and the neurons that are most strongly connected in the network?
 
-:question::question::question: Select all of the hub neurons that are also part of the locomotion system of _C. elegans_.
+:question::question::question:
+Select all of the hub neurons that are also part of the locomotion system of _C. elegans_.
 
 ---
 
@@ -310,9 +314,11 @@ isBodyNeuron = (neuronLabels==2); % Construct a binary indicator for body neuron
 
 Use the `isBodyNeuron` indicator to reduce the full adjacency matrix down to include information about body neurons only, as a new adjacency matrix, `adjMatrixBody`.
 
-:question::question::question: How many connections exist between the body neurons of _C. elegans_?
+:question::question::question:
+How many connections exist between the body neurons of _C. elegans_?
 
-:question::question::question: In the sketch above, identify the part of the adjacency matrix that corresponds to connections _from_ body neurons _to_ head neurons.
+:question::question::question:
+In the sketch above, identify the part of the adjacency matrix that corresponds to connections _from_ body neurons _to_ head neurons.
 By constructing an indicator for head neurons, as `isHeadNeuron = (neuronLabels==1);`, compute the total number of connections made _from_ a body neuron to a head neuron.
 
 #### :yum: [Optional]: Visualize body-body neuron connectivity:yum:
@@ -389,7 +395,8 @@ ylabel('Connection probability')
 ```
 
 :question::question::question:
-What is your fitted exponential exponent? (1 decimal place is sufficient)
+What is your fitted exponential exponent (/mm)?
+(1 decimal place is sufficient)
 
 :question::question::question:
 True or False: The data approximately follow an exponential __decay__. A pair of nearby neurons is __more likely__ to be connected than a pair of distant neurons.

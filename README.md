@@ -3,6 +3,7 @@
 This tutorial will walk you through a basic understanding of complex networks.
 
 ### Getting Started: General PHYS3888 tutorial info
+
 Like all PHYS3888 tutorials, questions requiring an answer to be input to the Canvas quiz are labeled as '':question::question::question:''.
 Optional questions are labeled '':yum:'' (just for fun) and optional advanced questions are labeled as '':fire:''.
 
@@ -10,6 +11,7 @@ Before you get started, download all the material for this tutorial to your comp
 Open Matlab and navigate to the directory you saved the files to, and then work through the tutorial in Matlab, following the instructions in this browser window (which renders the instructions contained in `README.md`).
 
 ### Intro
+
 Networks are a representation of objects (nodes) and the connections between pairs of nodes (edges).
 
 As an example dataset we will use the network of neurons, and their connectivity in the nematode worm, _C. elegans_ :bug:, measured through painstaking reconstruction from electron microscopy.
@@ -46,6 +48,7 @@ We could do the same to the columns as `M_col = M(:,ix)`.
 And we can reorder both together as `M_both = M(ix,ix)`
 
 ### Producing a permutation by sorting
+
 What if we want to sort the rows `M` according to its first column?
 Let's look at the first column: `M(:,1)`.
 We can get this permutation using the `sort` function, as:
@@ -57,6 +60,7 @@ Our permutation is the second output of this function, as `ix`, and we have igno
 Now we can use this permutation, `ix`, to sort the rows of M as: `M_sort = M(ix,:)`.
 
 ### Subsetting
+
 What if we want to keep only a subset of rows/columns of `M`?
 One way is to define a logical indicator for the rows we want to keep:
 
@@ -73,6 +77,7 @@ Note that the same results as above would be obtained if we instead defined the 
 ### Summing elements of a matrix
 
 #### Rows/columns
+
 Let's keep the first four columns of M.
 I'm sure you knew that you can do this as `M_cut = M(:,1:4)`
 
@@ -96,6 +101,7 @@ There is also the `'all'` setting in `sum` that gives another way of the doing t
 ---
 
 ## Part 1: Representing and visualizing networks
+
 Ok, let's get into it.
 
 First load in the _C. elegans_ connectivity data using the function `LoadCElegansData`:
@@ -122,7 +128,7 @@ The plot reveals complex connectivity patterns between pairs of neurons in _C. e
 
 #### Plotting a sorted adjacency matrix
 
-In their 2018 paper, Arnatkeviciute plotted the same data in Figure 1A, shown here:
+In their 2018 paper, Arnatkeviciute et al. plotted the same data in Figure 1A, shown here:
 
 ![Arnatkeviciute et al.](figs/Arnatkeviciute.png)
 
@@ -310,6 +316,7 @@ Use the `isBodyNeuron` indicator to reduce the full adjacency matrix down to inc
 By constructing an indicator for head neurons, as `isHeadNeuron = (neuronLabels==1);`, compute the total number of connections made _from_ a body neuron to a head neuron.
 
 #### :yum: [Optional]: Visualize body-body neuron connectivity:yum:
+
 Visualize interconnectivity between the worm's body neurons using `imagesc()` (as we did for the full network above).
 Visually estimate the probability that if a pair of neurons are connected, that this connection is reciprocal?
 
@@ -326,6 +333,7 @@ Store the result in the variable `positionXY_body`.
 2. Convert these body-neuron coordinates into Euclidean distances using the `pdist` function. Use the `squareform` function to convert these distances into a matrix and store them in a new variable, `distMatrixBody`.
 
 ### Estimating connection probabilities
+
 Ok, so now we have a physical distance for all pairs of body neurons, `distMatrixBody`, and whether a connection exists or not, `adjMatrixBody`.
 We can now proceed to compute the probability that two neurons will be connected as a function of their separation distance.
 
@@ -334,13 +342,13 @@ Do you see how this works?
 Consider a vector with 50% 1s: `mean([1,1,0,0]) = 0.5`, or a vector with 80% 1s: `mean([1,1,1,1,0]) = 0.8`.
 We use this property of averaging binary indicators to compute the connection probability.
 
-### Distance bins
+### Connection probability as a function of distance
 
-Run the code below, which makes 10 equally-spaced bins (`numBins = 10`) through the range of body-body distances, and, for pairs of neurons in that distance range, computes the probability that connections exist between them.
+Now we want to compute the probability that a connection exists in __each of 10 equally-spaced distance bins__.
 
-#### Connection probability as a function of distance
-Now we want to compute the probability that a connection exists in each of 10 equally-spaced distance bins.
-Set `numBins` and run `makeBins` as below to do this.
+The `makeBins` function computes a set of equally spaced distance bins across the given set of distances (e.g., `distMatrixBody`) and, for pairs of neurons in each distance bin, computes the probability that connections exist between them (e.g., using `adjMatrixBody`).
+
+Set `numBins` and then run `makeBins` as below:
 
 ```matlab
 % The makeBins function hides the dirty work (including removing self-connections from the computation):
@@ -355,6 +363,8 @@ plot(distBinCenters,connProb,'o-k')
 xlabel('Separation distance (mm)')
 ylabel('Connection probability')
 ```
+
+We can now fit an exponential:
 
 :question::question::question:
 How does connection probability depend on separation distance in _C. elegans_?

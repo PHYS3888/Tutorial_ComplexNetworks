@@ -351,7 +351,8 @@ The `makeBins` function computes a set of equally spaced distance bins across th
 Set `numBins` and then run `makeBins` as below:
 
 ```matlab
-% The makeBins function hides the dirty work (including removing self-connections from the computation):
+% The makeBins function hides the dirty work
+% (including removing self-connections from the computation):
 [distBinCenters,connProb] = makeBins(distMatrixBody,adjMatrixBody,numBins);
 ```
 
@@ -364,12 +365,34 @@ xlabel('Separation distance (mm)')
 ylabel('Connection probability')
 ```
 
-We can now fit an exponential:
+How does connection probability depend on separation distance in _C. elegans_?
+
+We can also check the validity of the famous _exponential distance rule_ in systems neuroscience by fitting an exponential, `f(x) = A exp(-n x)` to the data:
+
+```matlab
+s = fitoptions('Method','NonlinearLeastSquares','StartPoint',[0.15,5]);
+f = fittype('A*exp(-n*x)','options',s);
+[c,Stats] = fit(distBinCenters',connProb',f);
+
+% The two fitted parameters are c.A and c.n
+% So we can define a function for the fitted exponential:
+f_handle = @(x) c.A.*exp(-c.n*x);
+
+% And now we can plot the data and the exponential together:
+f = figure('color','w');
+hold('on')
+plot(distBinCenters,connProb,'o-k')
+plot(distBinCenters,f_handle(distBinCenters),'--b')
+legend('Binned Data','Fitted Exponential')
+xlabel('Separation distance (mm)')
+ylabel('Connection probability')
+```
 
 :question::question::question:
-How does connection probability depend on separation distance in _C. elegans_?
-Does this mean that a pair of nearby neurons are more or less likely to be connected than a pair of distant neurons?
-Upload your plot.
+What is your fitted exponential exponent? (1 decimal place is sufficient)
+
+:question::question::question:
+True or False: The data approximately follow an exponential __decay__. A pair of nearby neurons is __more likely__ to be connected than a pair of distant neurons.
 
 ---
 

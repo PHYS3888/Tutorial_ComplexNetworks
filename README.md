@@ -2,7 +2,7 @@
 
 This tutorial will walk you through a basic understanding of complex networks.
 
-### Getting Started: General PHYS3888 tutorial info
+## Getting Started: General PHYS3888 tutorial info
 
 Like all PHYS3888 tutorials, questions requiring an answer to be input to the Canvas quiz are labeled as '':question::question::question:''.
 Optional questions are labeled '':yum:'' (just for fun) and optional advanced questions are labeled as '':fire:''.
@@ -10,7 +10,7 @@ Optional questions are labeled '':yum:'' (just for fun) and optional advanced qu
 Before you get started, download all the material for this tutorial to your computer by pressing the green "Clone or download" button above, and click "Download as zip".
 Open Matlab and navigate to the directory you saved the files to, and then work through the tutorial in Matlab, following the instructions in this browser window (which renders the instructions contained in `README.md`).
 
-### Intro
+## Intro
 
 Networks are a representation of objects (nodes) and the connections between pairs of nodes (edges).
 
@@ -52,9 +52,11 @@ And we can reorder both together as `M_both = M(ix,ix)`
 What if we want to sort the rows `M` according to its first column?
 Let's look at the first column: `M(:,1)`.
 We can get this permutation using the `sort` function, as:
+
 ```matlab
 [~,ix] = sort(M(:,1),'ascend')
 ```
+
 Our permutation is the second output of this function, as `ix`, and we have ignored the first output by using a `~` in its place.
 
 Now we can use this permutation, `ix`, to sort the rows of M as: `M_sort = M(ix,:)`.
@@ -376,30 +378,29 @@ How does connection probability depend on separation distance in _C. elegans_?
 We can also check the validity of the famous _exponential distance rule_ in systems neuroscience by fitting an exponential, `f(x) = A exp(-n x)` to the data:
 
 ```matlab
-s = fitoptions('Method','NonlinearLeastSquares','StartPoint',[0.15,5]);
-f = fittype('A*exp(-n*x)','options',s);
-[c,Stats] = fit(distBinCenters',connProb',f);
-
-% The two fitted parameters are c.A and c.n
-% So we can define a function for the fitted exponential:
-f_handle = @(x) c.A.*exp(-c.n*x);
+[expFittedData,A,n] = fitExponential(distBinCenters',connProb');
 
 % And now we can plot the data and the exponential together:
 f = figure('color','w');
 hold('on')
 plot(distBinCenters,connProb,'o-k')
-plot(distBinCenters,f_handle(distBinCenters),'--b')
+plot(distBinCenters,expFittedData,'--b')
+% We are well-trained scientists, so we always label our axes and all objects on our plots:
 legend('Binned Data','Fitted Exponential')
 xlabel('Separation distance (mm)')
 ylabel('Connection probability')
 ```
 
-:question::question::question:
-What is your fitted exponential exponent (/mm)?
-(1 decimal place is sufficient)
+You'll see that the `fitExponential` function has three outputs.
+Look inside the `fitExponential` function to understand what they are.
 
 :question::question::question:
-True or False: The data approximately follow an exponential __decay__. A pair of nearby neurons is __more likely__ to be connected than a pair of distant neurons.
+What is your fitted exponential decay rate (/mm)?
+Give your answer to 1 decimal place.
+
+:question::question::question:
+True or False: The data approximately follow an exponential __decay__.
+A pair of nearby neurons is __more likely__ to be connected than a pair of distant neurons.
 
 ---
 

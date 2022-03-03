@@ -7,7 +7,7 @@ This tutorial will walk you through a basic understanding of complex networks.
 Like all PHYS3888 tutorials, questions requiring an answer to be input to the Canvas quiz are labeled as '':question::question::question:''.
 Optional questions are labeled '':yum:'' (just for fun) and optional advanced questions are labeled as '':fire:''.
 
-Before you get started, download all the material for this tutorial to your computer by pressing the green "Clone or download" button above, and click "Download as zip".
+Before you get started, download all the material for this tutorial to your computer by pressing the green "Code" button above, and click "Download as zip".
 Open Matlab and navigate to the directory you saved the files to, and then work through the tutorial in Matlab, following the instructions in this browser window (which renders the instructions contained in `README.md`).
 
 ## Intro
@@ -21,6 +21,7 @@ Note that the network of connectivity between elements of the brain is called a 
 
 This data has been analyzed by many physicists (and other scientists).
 This tutorial follows results from [this recent paper](http://dx.plos.org/10.1371/journal.pcbi.1005989), and is presented in three parts:
+
 1. Representing and visualizing networks
 2. Computing network properties
 3. Physical embedding
@@ -31,6 +32,7 @@ In this section you will brush up on a few basic commands for reordering, subset
 Aim to get this done before the tutorial so that you can focus your in-class time on the core material rather than coding syntax.
 
 Let's start with a 5x5 matrix:
+
 ```matlab
 M = magic(5);
 ```
@@ -43,6 +45,7 @@ Let's reorder the rows according to the ordering defined by: `[1,4,3,5,2]`:
 ix = [1,4,3,5,2];
 M_row = M(ix,:)
 ```
+
 Verify how the order of the rows of `M` have been permuted as specified by the `ix` permutation, and the result stored in the new, row-reordered matrix, `M_row`.
 We could do the same to the columns as `M_col = M(:,ix)`.
 And we can reorder both together as `M_both = M(ix,ix)`
@@ -107,6 +110,7 @@ There is also the `'all'` setting in `sum` that gives another way of the doing t
 Ok, let's get into it.
 
 First load in the _C. elegans_ connectivity data using the function `LoadCElegansData`:
+
 ```matlab
 [adjMatrix,neuronNames,positionXY] = LoadCElegansData();
 ```
@@ -121,6 +125,7 @@ Starting an analysis with a comprehensive visualization can help identify any is
 
 Let's start with plotting the adjacency matrix as an image, using the `imagesc` function.
 Take a look inside the `PlotAdjacencyMatrix` function to see the simple set of commands to generate this plot:
+
 ```matlab
 PlotAdjacencyMatrix(adjMatrix)
 ```
@@ -147,20 +152,21 @@ Reorder the adjacency matrix so that neurons are ordered according to their posi
 Verify that the result matches the result from Arnatkeviciute et al. (2018) (ignoring coloring)?
 
 Upload the lines of code you used to construct your reordered matrix to Canvas.
-_Hint:_ Use the `sort` function to get the permutation corresponding to the desired reordering (you can read about this function using `doc sort`).
+_Hint:_ Use the `sort` function to get the permutation corresponding to the desired reordering (as in the pre-work).
 
 __Note__: The remainder of this tutorial will work with the original (unordered) matrix, `adjMatrix`.
 
 ### Plotting the network in physical space
 
-Let's visualize the adjacency matrix visually as a ball-and-stick representation.
+Let's visualize the adjacency matrix as a ball-and-stick representation:
 
 ```matlab
 G = digraph(adjMatrix); % construct a graph object
 p = plot(G); % plot the graph
 ```
 
-Do you know what you're looking at?! Zoom in and have a play :mag::smiley:
+Do you know what you're looking at?!
+Zoom in and have a play :mag::smiley:
 
 Note that this visualization is in an abstract space, that is, the coordinates don't correspond to physical space.
 But we have two-dimensional coordinates for every neuron, `positionXY`, that we can use to plot the network information in physical space:
@@ -198,7 +204,6 @@ Recall the difference between a binary and a weighted network.
 Do a simple test to determine whether the network captured in `adjMatrix` is binary or weighted.
 (_Hint:_ one way is to use the `unique()` function).
 
-
 #### Is the network directed or undirected?
 
 Recall the difference between an undirected and a directed network.
@@ -207,6 +212,7 @@ Verify that the code below tests for directedness:
 ```matlab
 symmetricMatches = (adjMatrix'==adjMatrix);
 ```
+
 What should you look for in the `symmetricMatches` matrix?
 
 #### Does the connectome contain self-connections?
@@ -246,12 +252,14 @@ The total number of connections involving a neuron (both outgoing and incoming) 
 ```matlab
 kTot = kIn + kOut';
 ```
+
 (we need to transpose `kOut` using `'` to match the dimensions for the sum).
 
 Recall that in a random network, there is a tight distribution about the mean degree.
 If neurons connect at random, this would mean that most neurons will have a similar number of connections, with a tight spread around a mean value (a Binomial/Poisson distribution).
 
 We can test this by plotting the degree distribution to see how connectivity is distributed across neurons:
+
 ```matlab
 PlotDistribution(kTot,20); % use 20 bins in the histogram
 xlabel('Total degree, kTot')
@@ -271,9 +279,11 @@ We can first sort neurons from the most to the least connected by applying the `
 ```matlab
 [~,ix] = sort(kTot,'descend');
 ```
+
 This second output, `ix`, gives us the permutation that sorts neurons from the most connected (`ix(1)`) to the least connected (`ix(end)`).
 
 So now we can use this `ix` to list the top ten:
+
 ```matlab
 ListTen(neuronNames,kTot,ix)
 ```
@@ -309,6 +319,7 @@ The part of the adjacency matrix that we're trying to isolate (shaded yellow) is
 As shown in the sketch, we need can start by constructing a _binary indicator_ for body neurons: this variable should be `true` for body neurons and `false` for head or tail neurons.
 Because `GiveMeNeuronLabels()` labels body neurons as `2`, we can do this by finding where this indicator equals 2.
 Make sure you understand how this is achieved using the following code:
+
 ```matlab
 neuronLabels = GiveMeNeuronLabels(); % Labels neurons in the body as '2'
 isBodyNeuron = (neuronLabels==2); % Construct a binary indicator for body neurons

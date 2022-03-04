@@ -146,13 +146,14 @@ On closer inspection, we find that Arnatkeviciute  et al. (2018) ordered their m
 The spatial co-ordinates of each neuron is in the variable `positionXY`.
 The first column of `positionXY` is the `x`-coordinates (broadly from head to tail), and the second column contains the `y`-coordinates.
 
-#### :question::question::question: Q1: Sorting nodes by location
+#### Sorting neurons head-to-tail
 
 Reorder the adjacency matrix so that neurons are ordered according to their position from head-to-tail, then plot this matrix by passing it into the `PlotAdjacencyMatrix` function.
 Verify that the result matches the result from Arnatkeviciute et al. (2018) (ignoring coloring)?
 
-Upload the lines of code you used to construct your reordered matrix to Canvas.
 _Hint:_ Use the `sort` function to get the permutation corresponding to the desired reordering (as in the pre-work).
+
+:question::question::question: __Q1:__ Upload the lines of code you used to construct your reordered matrix.
 
 __Note__: The remainder of this tutorial will work with the original (unordered) matrix, `adjMatrix`.
 
@@ -183,9 +184,6 @@ axis('equal') % make horizontal and vertical scales comparable
 You can zoom in on this physical connectome plot to explore the cluster of head neurons (towards the left), and the cluster of tail neurons (towards the right).
 Body neurons are scattered through the length of the nematode worm.
 
-
-<!-- #### :question::question::question: Q2: Distinguishing head, body, and tail neurons -->
-
 You can retrieve the labeling of neurons using the `GiveMeNeuronLabels` function, which labels head neurons as `1`, body neurons as `2`, and tail neurons as `3`).
 Use this information to adjust the physical connectome plot above to color head, body, and tail neurons a different color by setting the `p.NodeCData` property.
 
@@ -196,7 +194,8 @@ Use this information to adjust the physical connectome plot above to color head,
 We can ask many basic questions by running simple operations on the adjacency matrix.
 
 #### How many neurons?
-:question::question::question: From the size of the adjacency matrix, determine how many neurons there are.
+
+:question::question::question: __Q2:__ From the size of the adjacency matrix, determine how many neurons there are.
 
 #### Is the network binary or weighted?
 
@@ -226,7 +225,7 @@ Use the `sum()` command to count the total number of edges.
 Do you need to divide this number by 2?
 Why/why not?
 
-:question::question::question: How many edges are in the _C. elegans_ connectome?
+:question::question::question: __Q3:__ How many edges are in the _C. elegans_ connectome?
 
 #### In-degree, `kIn`, and out-degree, `kOut`
 
@@ -265,8 +264,7 @@ PlotDistribution(kTot,20); % use 20 bins in the histogram
 xlabel('Total degree, kTot')
 ```
 
-:question::question::question:
-What about this distribution tells us that there are highly connected hub neurons in the _C. elegans_ connectome?
+:question::question::question: __Q4:__ What about this distribution tells us that there are highly connected hub neurons in the _C. elegans_ connectome?
 
 #### What do the hub neurons do?
 
@@ -290,8 +288,7 @@ ListTen(neuronNames,kTot,ix)
 
 Is there overlap between the neurons that control the worm's locomotion and the neurons that are most strongly connected in the network?
 
-:question::question::question:
-Select all of the hub neurons that are also part of the locomotion system of _C. elegans_.
+:question::question::question: __Q5:__ Select all of the hub neurons that are also part of the locomotion system of _C. elegans_.
 
 ---
 
@@ -309,12 +306,13 @@ You can see that this relationship is clearest for connections between body neur
 
 Let's try to reproduce this finding in the body neurons of the _C. elegans_ nervous system. :satisfied:
 
-#### A worm body connectome
+### A worm body connectome
 
 Because we're only interested in body neurons, our first step is to filter down the adjacency matrix to only contain body neurons.
 Check out the sketch below of the different parts of the adjacency matrix to understand what we're trying to do.
 The part of the adjacency matrix that we're trying to isolate (shaded yellow) is where both the source and target are body neurons.
-![](figs/BodyBody.png)
+
+![Body-body](figs/BodyBody.png)
 
 As shown in the sketch, we need can start by constructing a _binary indicator_ for body neurons: this variable should be `true` for body neurons and `false` for head or tail neurons.
 Because `GiveMeNeuronLabels()` labels body neurons as `2`, we can do this by finding where this indicator equals 2.
@@ -327,17 +325,17 @@ isBodyNeuron = (neuronLabels==2); % Construct a binary indicator for body neuron
 
 Use the `isBodyNeuron` indicator to reduce the full adjacency matrix down to include information about body neurons only, as a new adjacency matrix, `adjMatrixBody`.
 
-:question::question::question:
+:question::question::question: __Q6:__
 How many connections exist between the body neurons of _C. elegans_?
 
-:question::question::question:
+:question::question::question: __Q7:__
 In the sketch above, identify the part of the adjacency matrix that corresponds to connections _from_ body neurons _to_ head neurons.
 By constructing an indicator for head neurons, as `isHeadNeuron = (neuronLabels==1);`, compute the total number of connections made _from_ a body neuron to a head neuron.
 
-#### :yum: [Optional]: Visualize body-body neuron connectivity:yum:
+#### :yum: [Optional]: Visualize body-body neuron connectivity :yum:
 
 Visualize interconnectivity between the worm's body neurons using `imagesc()` (as we did for the full network above).
-Visually estimate the probability that if a pair of neurons are connected, that this connection is reciprocal?
+From this plot, give a rough visual estimate of the probability that if a pair of neurons are connected, this connection is reciprocal?
 
 To assess your visual estimate, you can compute the true value by running the function `whatProportionReciprocal(adjMatrixBody)`.
 
@@ -405,11 +403,13 @@ ylabel('Connection probability')
 You'll see that the `fitExponential` function has three outputs.
 Look inside the `fitExponential` function to understand what they are.
 
-:question::question::question:
+:question::question::question: __Q8:__
 What is your fitted exponential decay rate (/mm)?
 Give your answer to 1 decimal place.
 
-:question::question::question:
+[_Note_: Don't worry if your lab partner gets a slightly different answer—different versions of Matlab can give slightly different answers]
+
+:question::question::question: __Q9:__
 True or False: The data approximately follow an exponential __decay__.
 A pair of nearby neurons is __more likely__ to be connected than a pair of distant neurons.
 
@@ -417,4 +417,4 @@ A pair of nearby neurons is __more likely__ to be connected than a pair of dista
 
 #### :fire: Optional challenge :fire:: connection probability
 
-Challenge: Repeat for the head -> tail, and tail -> head results.
+Challenge: Repeat for the head :arrow_right: tail, and tail :arrow_right: head results.

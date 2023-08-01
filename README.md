@@ -206,13 +206,28 @@ Do a simple test to determine whether the network captured in `adjMatrix` is bin
 #### Is the network directed or undirected?
 
 Recall the difference between an undirected and a directed network.
-Verify that the code below tests for directedness:
+What does the code below do?:
 
 ```matlab
 symmetricMatches = (adjMatrix'==adjMatrix);
 ```
 
-What should you look for in the `symmetricMatches` matrix?
+What should you look for in the `symmetricMatches` matrix to test for directedness?
+
+For example, what does the following code do?
+What would you expect it to output for a directed network?
+
+```matlab
+all(symmetricMatches(:))
+```
+
+Note that you can easily test for symmetry directly using the `issymmetric` function:
+
+```matlab
+issymmetric(adjMatrix)
+```
+
+Verify that this result matches your result above.
 
 #### Does the connectome contain self-connections?
 

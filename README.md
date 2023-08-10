@@ -269,8 +269,8 @@ kTot = kIn + kOut';
 
 (we need to transpose `kOut` using `'` to match the dimensions for the sum).
 
-Recall that in a random network, there is a tight distribution about the mean degree.
-If neurons connect at random, this would mean that most neurons will have a similar number of connections, with a tight spread around a mean value (a Binomial/Poisson distribution).
+Recall that in a randomly connected (Erdos–Renyi) network, the degree is tightly distributed about the mean degree (a Binomial distribution, or Poisson in the large _N_ limit).
+So if neurons are connecting with each other randomly, this would mean that most neurons should have a similar number of connections, _k_.
 
 We can test this by plotting the degree distribution to see how connectivity is distributed across neurons:
 
@@ -301,7 +301,7 @@ So now we can use this `ix` to list the top ten:
 ListTen(neuronNames,kTot,ix)
 ```
 
-Is there overlap between the neurons that control the worm's locomotion and the neurons that are most strongly connected in the network?
+Is there overlap between the neurons that control the worm's locomotion and the ten hub neurons that are most strongly connected in the network?
 
 :question::question::question: __Q5:__ Select all of the hub neurons that are also part of the locomotion system of _C. elegans_.
 
